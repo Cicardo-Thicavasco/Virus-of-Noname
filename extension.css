@@ -1,0 +1,20 @@
+/*十周年样式＆手杀样式一*/
+.player > .camp-wrap[data-camp="PI_plague"] > .camp-back {
+	background: linear-gradient(to bottom, rgb(255, 0, 0), rgb(128, 0, 0));
+}
+.player > .camp-wrap[data-camp="CI_cure"] > .camp-back {
+	background: linear-gradient(to bottom, rgb(0, 255, 255), rgb(128, 255, 255));
+}
+.player > .camp-wrap[data-camp="DI_disaster"] > .camp-back {
+	background: linear-gradient(to bottom, rgb(0, 255, 0), rgb(64, 128, 64));
+}
+/*手杀样式二*/
+.player > .camp-wrap[data-camp="PI_plague"] > .camp-name {
+	text-shadow: 0 0 5px rgb(255, 0, 0), 0 0 10px rgb(128, 0, 0), 0 0 15px rgb(64, 0, 0);
+}
+.player > .camp-wrap[data-camp="CI_cure"] > .camp-name {
+	text-shadow: 0 0 5px rgb(0, 255, 255), 0 0 10px rgb(0, 128, 128), 0 0 15px rgb(0, 64, 64);
+}
+.player > .camp-wrap[data-camp="DI_disaster"] > .camp-name {
+	text-shadow: 0 0 5px rgb(0, 255, 0), 0 0 10px rgb(64, 128, 64), 0 0 15px rgb(32, 64, 32);
+}

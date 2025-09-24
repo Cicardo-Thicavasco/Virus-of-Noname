@@ -1,0 +1,129 @@
+/* 基础样式 */
+
+.disaster-title {
+   /* 字体设置 */
+            font-family: "STKaiti", "华文楷体", serif; /* 华文楷体 */
+            font-size: 40px !important;
+            
+            /* 金属质感 */
+            background: linear-gradient(
+                  145deg,
+                #ffffff 0%,   /* 强高光 */
+                #ffffff 10%,   /* 保持高光区 */
+                #d0d0d0 12%,/* 硬过渡 */
+                #d0d0d0 25%,   /* 金属主色 */
+                #909090 27%,/* 硬过渡 */
+                #909090 45%,   /* 阴影 */
+                #ffffff 48%,/* 硬过渡 */
+                #ffffff 60%,   /* 反射高光 */
+                #b0b0b0 64%,/* 硬过渡 */
+                #b0b0b0 75%,   /* 反光区 */
+                #707070 78%,/* 硬过渡 */
+                #707070 100%  /* 深阴影 */
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            
+            /* 浮雕效果 */
+            text-shadow: 
+                -5px -5px 5px rgba(255, 255, 255, 0.8),  /* 左上高光 */
+                3px 3px 3px rgba(0, 0, 0, 0.5);          /* 右下阴影 */
+            
+            /* 绿色外发光 + 黑色描边 */
+            filter: 
+                drop-shadow(0 0 15px  rgb(0, 255, 0))   /* 绿色外发光 */
+                drop-shadow(0 0 5px rgb(64, 128, 64))   /* 墨绿色描边 */
+                drop-shadow(0 0 5px #000000)   /* 强化描边 */
+                drop-shadow(0 0 5px #000000)  /* 三层描边更清晰 */
+                contrast(1.2)
+                brightness(120%);
+            /* 血迹图片覆盖 */
+            position: relative;
+            display: inline-block;
+            padding: 15px 20px;
+            z-index: 1;
+ }
+  
+ .disaster-title::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('blood-drops.png') center/cover no-repeat;
+            color: transparent;
+            border-radius: 15px;
+            z-index: -1;
+            transform: scale(0.85);
+
+             /* 使用文字本身作为遮罩 */ 
+           -webkit-mask: linear-gradient(#fff, #fff), 
+            linear-gradient(#fff, #fff);
+            -webkit-mask-composite: source-in;
+            mask: linear-gradient(#fff, #fff) content-box, 
+            linear-gradient(#fff, #fff);
+            mask-composite: intersect;
+
+            /* 混合模式 */
+            mix-blend-mode: multiply;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 3.0s ease;
+          }
+.disaster-title:hover::after {
+            opacity: 0.8; /* 渐显到设定的透明度 */
+}
+
+.disaster-append {
+    font-family: "STKaiti", "华文楷体", "KaiTi", serif;
+    /* 字体大小24px */
+    font-size: 16px;
+    /* 字体倾斜 */
+    font-style: italic;
+    /* 黑色描边（通过drop-shadow实现） */
+    filter: drop-shadow(0 0 1px #000000) 
+            drop-shadow(0 0 1px #000000);
+    /* 可选：确保文字颜色不被描边影响（根据需求调整） */
+    color: #ffffff; /* 可根据实际需要修改文字颜色 */
+}
+
+a.disaster:link{
+ /* 楷体字体 */
+    font-family: "STKaiti", "华文楷体", "KaiTi", serif;
+    /* 红色文字 */
+    color: rgb(0, 255, 0);
+    /* 去除下划线 */
+    text-decoration: none;
+    font-size: 20px;
+}
+a.disaster:hover{
+ /* 楷体字体 */
+    font-family: "STKaiti", "华文楷体", "KaiTi", serif;
+    /* 红色文字 */
+    color: rgb(255, 255, 255);
+    /* 去除下划线 */
+    text-decoration: none;
+    font-size: 20px;
+}
+a.disaster:active{
+ /* 楷体字体 */
+    font-family: "STKaiti", "华文楷体", "KaiTi", serif;
+    /* 红色文字 */
+    color: rgb(0, 128, 0);
+    /* 去除下划线 */
+    text-decoration: none;
+    font-size: 20px;
+}
+a.disaster:visited{
+ /* 楷体字体 */
+    font-family: "STKaiti", "华文楷体", "KaiTi", serif;
+    /* 红色文字 */
+    color: rgb(0, 0, 0);
+    /* 去除下划线 */
+    text-decoration: none;
+    font-size: 20px;
+}
+
+
