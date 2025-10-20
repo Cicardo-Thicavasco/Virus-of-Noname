@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病原体分类表</title>
+    <style>
+        /* 原有样式保持不变 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: url('image/background/Red_Bg_01.png');
+            background-size: cover;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding:300px;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #400000;
+            position: relative;
+            overflow: hidden;
+            z-index: 10; 
+            height: 250px; /* 设置固定高度 */
+        }
+        
+        .slideshow-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: 30% 50%;
+            background-repeat: no-repeat;
+        }
+        
+        .slide.active {
+            opacity: 1;
+        }
+        
+        .title-container {
+            position: relative;
+            z-index: 20;
+            padding: 20px 30px;
+            display: inline-block;
+            margin:  auto;
+            max-width: 80%;
+            bottom: 30px;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 20; 
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            pointer-events: none; 
+        }
+
+        .header-content * {
+            pointer-events: auto; 
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+        
+        .subtitle-title {
+           /* 字体设置 */
+            font-family: "STKaiti", "华文楷体", serif; /* 华文楷体 */
+            font-size: 60px !important;
+            /* 金属质感 */
+            background: linear-gradient(
+                  145deg,
+                #ffffff 0%,   /* 强高光 */
+                #ffffff 10%,   /* 保持高光区 */
+                #d0d0d0 12%,/* 硬过渡 */
+                #d0d0d0 25%,   /* 金属主色 */
+                #909090 27%,/* 硬过渡 */
+                #909090 45%,   /* 阴影 */
+                #ffffff 48%,/* 硬过渡 */
+                #ffffff 60%,   /* 反射高光 */
+                #b0b0b0 64%,/* 硬过渡 */
+                #b0b0b0 75%,   /* 反光区 */
+                #707070 78%,/* 硬过渡 */
+                #707070 100%  /* 深阴影 */
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            
+            /* 浮雕效果 */
+            text-shadow: 
+                -7px -7px 7px rgba(255, 255, 255, 0.8), 
+                5px 5px 5px rgba(0, 0, 0, 0.5);         
+            
+            filter: 
+                drop-shadow(0 0 15px rgb(255, 0, 0))   
+                drop-shadow(0 0 5px rgb(128, 0, 0))   
+                drop-shadow(0 0 5px #000000)  
+                drop-shadow(0 0 5px #000000)  
+                contrast(1.2)
+                brightness(120%);
+        }
+
+        .subtitle {
+           /* 字体设置 */
+            font-family: "STKaiti", "华文楷体", serif; /* 华文楷体 */
+            font-size: 40px !important;
+            
+            /* 金属质感 */
+            background: linear-gradient(
+                  145deg,
+                #ffffff 0%,   /* 强高光 */
+                #ffffff 10%,   /* 保持高光区 */
+                #d0d0d0 12%,/* 硬过渡 */
+                #d0d0d0 25%,   /* 金属主色 */
+                #909090 27%,/* 硬过渡 */
+                #909090 45%,   /* 阴影 */
+                #ffffff 48%,/* 硬过渡 */
+                #ffffff 60%,   /* 反射高光 */
+                #b0b0b0 64%,/* 硬过渡 */
+                #b0b0b0 75%,   /* 反光区 */
+                #707070 78%,/* 硬过渡 */
+                #707070 100%  /* 深阴影 */
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            
+            /* 浮雕效果 */
+            text-shadow: 
+                -5px -5px 5px rgba(255, 255, 255, 0.8),  
+                3px 3px 3px rgba(0, 0, 0, 0.5);          
+            
+            filter: 
+                drop-shadow(0 0 15px rgb(255, 0, 0))  
+                drop-shadow(0 0 5px rgb(128, 0, 0))   
+                drop-shadow(0 0 5px #000000)   
+                drop-shadow(0 0 5px #000000)  
+                contrast(1.2)
+                brightness(120%);
+        }
+        
+        .slideshow-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            z-index: 3;
+            gap: 10px;
+        }
+        
+        .indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-image: url('image/style/hp/plague2.png');
+            background-size: cover;
+            outline: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .indicator.active {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: scale(1.2);
+            background-image: url('image/style/hp/plague1.png');
+            background-size: cover;
+        }
+        
+        .indicator:focus {
+            outline: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-options select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #db3434;
+            color: white;
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            color: #ff0000;
+        }
+        
+        .domain-bacteria {
+            background-color: #ffffbb !important;
+        }
+        
+        .domain-virus {
+            background-color: #bfe4ff !important;
+        }
+        
+        .domain-eukarya {
+            background-color: #fbd3df !important;
+        }
+
+        .domain-parasite {
+            background-color: #f3c4a5 !important;
+        }
+        
+        .domain-prion {
+            background-color: #c2f7ac !important;
+        }
+
+        .domain-none {
+            background-color: #f5f5f5 !important;
+        }
+        
+        .fictional {
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
+        .gram-positive {
+            color: blueviolet;
+            font-weight: bold;
+        }
+        
+        .gram-negative {
+            color: red;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 2px 0;
+            border-radius: 3px;
+        }
+        
+        /* 图片悬停显示样式 */
+        .image-tooltip {
+            position: fixed;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            display: none;
+            max-width: 300px;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        
+        .image-tooltip img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+        }
+        
+        .image-tooltip .tooltip-title {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 8px;
+            color: #333;
+        }
+        
+        td:first-child {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .filter-options {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+            
+            .image-tooltip {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+              <!-- 轮播容器 -->
+            <div class="slideshow-container">
+                <div class="slide active" style="background-image: url('image/plague/Bacteria.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/Virus.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/Fungus.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/Parasite.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/Prion.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/NanoVirus.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/BioWeapon.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/NeuraxWorm.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/NecroaVirus.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/SimianFlu.jpg');"></div>
+                <div class="slide" style="background-image: url('image/plague/ShadowPlague.jpg');"></div>
+            </div>
+             <!-- 轮播指示器 -->
+            <div class="slideshow-indicators">
+                <!-- 指示点将由JavaScript动态生成 -->
+            </div>
+ 
+             <div class="title-container">
+                <h1 class="subtitle-title">病原体分类表</h1>
+                <p class="subtitle">基于生物学分类的病原体系统分类</p>
+            </div>
+        </header>
+        </header>
+        
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索病原体...">
+            </div>
+            
+            <div class="filter-options">
+                <select id="domainFilter">
+                    <option value="">所有域</option>
+                    <option value="细菌域">细菌域</option>
+                    <option value="病毒域">病毒域</option>
+                    <option value="RNA病毒域">RNA病毒域</option>
+                    <option value="双链DNA病毒域">双链DNA病毒域</option>
+                    <option value="灵质病毒域">灵质病毒域</option>
+                    <option value="真核域">真核域</option>
+                    <option value="无">无</option>
+                </select>
+                
+                <select id="typeFilter">
+                    <option value="">所有类型</option>
+                    <option value="虚构">虚构病原体</option>
+                    <option value="真实">真实病原体</option>
+                </select>
+                  <button class="tree-chart-btn" id="showTreeChart">查看分类树状图</button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>域</th>
+                        <th>界</th>
+                        <th>门</th>
+                        <th>纲</th>
+                        <th>目</th>
+                        <th>科</th>
+                        <th>属</th>
+                        <th>种</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="pathogenTable">
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 病原体分类数据表 | 鹿都智川介 | 数据仅供当前参考</p>
+            <p>数据来源：ICTV 2024 | ICSP 2024</p>
+        </div>
+    </div>
+
+    <!-- 图片悬停显示容器 -->
+    <div id="imageTooltip" class="image-tooltip">
+        <img src="" alt="病原体图片">
+        <div class="tooltip-title"></div>
+    </div>
+
+     <!-- 音频元素 -->
+    <audio id="clickSound" preload="auto">
+        <source src="audio/effect/help.mp3" type="audio/mpeg">
+    </audio>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+     <style>
+        #treeChart {
+            width: 1000px;
+            height: 600px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+        }
+    </style>
+    <script>
+        // 病原体数据
+         const pathogens = [
+            {id: "PI_bacteria", domain: "细菌域", kingdom: "", phylum: "", class: "", order: "", family: "", genus: "", species: "细菌", note: "革兰氏"},
+            {id: "PI_staphylococcusaureus", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "厚壁菌门", class: "芽孢杆菌纲", order: "葡萄球菌目", family: "葡萄球菌科", genus: "葡萄球菌属", species: "金黄色葡萄球菌", note: "阳性"},
+            {id: "PI_pneumococcus", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "厚壁菌门", class: "芽孢杆菌纲", order: "乳杆菌目", family: "链球菌科", genus: "链球菌属", species: "肺炎链球菌", note: "阳性"},
+            {id: "PI_pyococcus", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "厚壁菌门", class: "芽孢杆菌纲", order: "乳杆菌目", family: "链球菌科", genus: "链球菌属", species: "酿脓链球菌", note: "阳性"},
+            {id: "PI_lactobacillus", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "厚壁菌门", class: "芽孢杆菌纲", order: "乳杆菌目", family: "乳杆菌科", genus: "乳杆菌属", species: "乳酸杆菌", note: "阳性"},
+            {id: "PI_anthrax", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "厚壁菌门", class: "芽孢杆菌纲", order: "芽孢杆菌目", family: "芽孢杆菌科", genus: "芽孢杆菌属", species: "炭疽芽孢杆菌", note: "阳性"},
+            {id: "PI_tetanus", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "厚壁菌门", class: "梭菌纲", order: "梭菌目", family: "梭菌科", genus: "梭菌属", species: "破伤风梭菌", note: "阳性"},
+            {id: "PI_diphtheria", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "放线菌门", class: "放线菌纲", order: "放线菌目", family: "棒杆菌科", genus: "棒杆菌属", species: "白喉棒状杆菌", note: "阳性"},
+            {id: "PI_tuberculosis", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "放线菌门", class: "放线菌纲", order: "放线菌目", family: "分枝杆菌科", genus: "分枝杆菌属", species: "结核分枝杆菌", note: "阳性"},
+            {id: "PI_leprosy", domain: "细菌域", kingdom: "芽孢杆菌界", phylum: "放线菌门", class: "放线菌纲", order: "放线菌目", family: "分枝杆菌科", genus: "分枝杆菌属", species: "麻风分枝杆菌", note: "阳性"},
+            {id: "PI_acetobacter", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "α-变形菌纲", order: "红螺菌目", family: "醋酸杆菌科", genus: "醋酸杆菌属", species: "醋酸杆菌", note: "阴性"},
+            {id: "PI_rickettsia", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "α-变形菌纲", order: "立克次氏体目", family: "立克次氏体科", genus: "东方体属", species: "东方立克次氏体", note: "阴性"},
+            {id: "PI_brucella", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "α-变形菌纲", order: "根瘤菌目", family: "布鲁氏菌科", genus: "布鲁氏菌属", species: "马尔他布鲁氏杆菌", note: "阴性"},
+            {id: "PI_gonorrhea", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "β-变形菌纲", order: "奈瑟菌目", family: "奈瑟菌科", genus: "奈瑟菌属", species: "淋病奈瑟球菌", note: "阴性"},
+            {id: "PI_pertussis", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "β-变形菌纲", order: "伯克霍尔德菌目", family: "产碱杆菌科", genus: "鲍特菌属", species: "百日咳鲍特杆菌", note: "阴性"},
+            {id: "PI_cholera", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "γ-变形菌纲", order: "弧菌目", family: "弧菌科", genus: "弧菌属", species: "霍乱弧菌", note: "阴性"},
+            {id: "PI_vibriovulnificus", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "γ-变形菌纲", order: "弧菌目", family: "弧菌科", genus: "弧菌属", species: "创伤弧菌", note: "阴性"},
+            {id: "PI_typhoid", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "γ-变形菌纲", order: "肠杆菌目", family: "肠杆菌科", genus: "沙门菌属", species: "伤寒沙门菌", note: "阴性"},
+            {id: "PI_bubonicplague", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "γ-变形菌纲", order: "肠杆菌目", family: "肠杆菌科", genus: "耶尔森菌属", species: "鼠疫耶尔森菌", note: "阴性"},
+            {id: "PI_pestilence", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "γ-变形菌纲", order: "肠杆菌目", family: "肠杆菌科", genus: "耶尔森菌属", species: "鼠疫耶尔森菌", note: "阴性"},
+            {id: "PI_escherichiacoli", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "γ-变形菌纲", order: "肠杆菌目", family: "肠杆菌科", genus: "埃希菌属", species: "大肠埃希氏菌", note: "阴性"},
+            {id: "PI_helicobacterpylori", domain: "细菌域", kingdom: "假单胞菌界", phylum: "变形菌门", class: "ε-变形菌纲", order: "弯曲菌目", family: "螺杆菌科", genus: "螺杆菌属", species: "幽门螺杆菌", note: "阴性"},
+            {id: "PI_syphilis", domain: "细菌域", kingdom: "细菌界", phylum: "螺旋体门", class: "螺旋体纲", order: "螺旋体目", family: "螺旋体科", genus: "密螺旋体属", species: "梅毒螺旋体", note: "阴性"},
+            {id: "PI_mycoplasma", domain: "细菌域", kingdom: "细菌界", phylum: "柔膜菌门", class: "柔膜菌纲", order: "支原体目", family: "支原体科", genus: "脲原体属", species: "解脲支原体", note: "阴性"},
+            {id: "PI_chlamydia", domain: "细菌域", kingdom: "细菌界", phylum: "衣原体门", class: "衣原体纲", order: "衣原体目", family: "衣原体科", genus: "衣原体属", species: "沙眼衣原体", note: "阴性"},
+            {id: "PI_virus", domain: "病毒域", kingdom: "", phylum: "", class: "", order: "", family: "", genus: "", species: "病毒", note: ""},
+            {id: "PI_dengue", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "黄病毒门", class: "黄病毒纲", order: "黄热病毒目", family: "黄病毒科", genus: "黄病毒属", species: "登革热病毒", note: ""},
+            {id: "PI_westnilevirus", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "黄病毒门", class: "黄病毒纲", order: "黄热病毒目", family: "黄病毒科", genus: "黄病毒属", species: "西尼罗病毒", note: ""},
+            {id: "PI_flavivirus", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "黄病毒门", class: "黄病毒纲", order: "黄热病毒目", family: "黄病毒科", genus: "黄病毒属", species: "黄热病毒", note: ""},
+            {id: "PI_zikavirus", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "黄病毒门", class: "黄病毒纲", order: "黄热病毒目", family: "黄病毒科", genus: "黄病毒属", species: "寨卡病毒", note: ""},
+            {id: "PI_poliomyelitis", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "小RNA病毒门", class: "小南嵌套病毒纲", order: "小RNA病毒目", family: "小RNA病毒科", genus: "肠病毒属", species: "脊髓灰质炎病毒", note: ""},
+            {id: "PI_rhinovirus", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "小RNA病毒门", class: "小南嵌套病毒纲", order: "小RNA病毒目", family: "小RNA病毒科", genus: "肠病毒属", species: "A型鼻病毒", note: ""},
+            {id: "PI_coxsackievirus", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "小RNA病毒门", class: "小南嵌套病毒纲", order: "小RNA病毒目", family: "小RNA病毒科", genus: "肠病毒属", species: "A16型柯萨奇病毒", note: ""},
+            {id: "PI_norovirus", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "杯状病毒门", class: "杯状病毒纲", order: "小RNA病毒目", family: "杯状病毒科", genus: "诺如病毒属", species: "诺瓦克病毒", note: ""},
+            {id: "PI_necroa", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "小RNA病毒门", class: "小RNA病毒纲", order: "套式病毒目", family: "丧冠病毒科", genus: "丧尸病毒属", species: "丧尸病毒", note: "虚构"},
+            {id: "PI_lassavirus", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "多段节病毒门", class: "艾略特病毒纲", order: "布尼亚病毒目", family: "沙粒病毒科", genus: "哺乳动物沙粒病毒属", species: "拉沙病毒", note: ""},
+            {id: "PI_hantavirus", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "多段节病毒门", class: "艾略特病毒纲", order: "布尼亚病毒目", family: "汉坦病毒科", genus: "正汉坦病毒属", species: "汉坦病毒", note: ""},
+            {id: "PI_avianinfluenza", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "多段节病毒门", class: "艾略特病毒纲", order: "布尼亚病毒目", family: "正粘病毒科", genus: "甲型流感病毒属", species: "H5N1甲型流感病毒", note: ""},
+            {id: "PI_spanishinfluenza", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "多段节病毒门", class: "艾略特病毒纲", order: "布尼亚病毒目", family: "正粘病毒科", genus: "甲型流感病毒属", species: "H1N1亚型流感病毒(1918株)", note: ""},
+            {id: "PI_swineflu", domain: "RNA病毒域", kingdom: "正RNA病毒界", phylum: "多段节病毒门", class: "艾略特病毒纲", order: "布尼亚病毒目", family: "正粘病毒科", genus: "甲型流感病毒属", species: "H1N1亚型流感病毒", note: ""},
+            {id: "PI_measles", domain: "RNA病毒域", kingdom: "负RNA病毒界", phylum: "单段节病毒门", class: "单股反链病毒纲", order: "单股反链病毒目", family: "副粘病毒科", genus: "麻疹病毒属", species: "麻疹病毒", note: ""},
+            {id: "PI_nipahvirus", domain: "RNA病毒域", kingdom: "负RNA病毒界", phylum: "单段节病毒门", class: "单股反链病毒纲", order: "单股反链病毒目", family: "副粘病毒科", genus: "亨尼帕病毒属", species: "尼帕病毒", note: ""},
+            {id: "PI_rabies", domain: "RNA病毒域", kingdom: "负RNA病毒界", phylum: "单段节病毒门", class: "单股反链病毒纲", order: "单股反链病毒目", family: "弹状病毒科", genus: "狂犬病毒属", species: "狂犬病病毒", note: ""},
+            {id: "PI_ebolavirus", domain: "RNA病毒域", kingdom: "负RNA病毒界", phylum: "单段节病毒门", class: "单股反链病毒纲", order: "单股反链病毒目", family: "丝状病毒科", genus: "埃博拉病毒属", species: "埃博拉病毒", note: ""},
+            {id: "PI_marburgvirus", domain: "RNA病毒域", kingdom: "负RNA病毒界", phylum: "单段节病毒门", class: "单股反链病毒纲", order: "单股反链病毒目", family: "丝状病毒科", genus: "马尔堡病毒属", species: "马尔堡病毒", note: ""},
+            {id: "PI_simianflu", domain: "RNA病毒域", kingdom: "负RNA病毒界", phylum: "单段节病毒门", class: "逆转录病毒纲", order: "逆转录病毒目", family: "猿人病毒科", genus: "智猿脑歧属", species: "智猿脑歧病毒", note: "虚构"},
+            {id: "PI_aids", domain: "RNA病毒域", kingdom: "副病毒界", phylum: "慢病毒门", class: "逆转录病毒纲", order: "逆转录病毒目", family: "逆转录病毒科", genus: "慢病毒属", species: "人类免疫缺陷病毒", note: ""},
+            {id: "PI_pithovirus", domain: "双链DNA病毒域", kingdom: "巴姆福德病毒界", phylum: "核质病毒门", class: "巨病毒纲", order: "痘病毒目", family: "阔口罐病毒科", genus: "阔口罐病毒属", species: "西伯利亚阔口罐病毒", note: ""},
+            {id: "PI_smallpox", domain: "双链DNA病毒域", kingdom: "巴姆福德病毒界", phylum: "核质病毒门", class: "痘病毒纲", order: "壳病毒目", family: "痘病毒科", genus: "正痘病毒属", species: "天花病毒", note: ""},
+            {id: "PI_mpoxvirus", domain: "双链DNA病毒域", kingdom: "巴姆福德病毒界", phylum: "核质病毒门", class: "痘病毒纲", order: "壳病毒目", family: "痘病毒科", genus: "正痘病毒属", species: "猴痘病毒", note: ""},
+            {id: "PI_papillomavirus", domain: "双链DNA病毒域", kingdom: "肖特基病毒界", phylum: "科萨病毒门", class: "乳头多瘤空泡病毒纲", order: "分离病毒目", family: "乳头瘤病毒科", genus: "乳头瘤病毒属", species: "人乳头瘤病毒", note: ""},
+            {id: "PI_varicella", domain: "双链DNA病毒域", kingdom: "香港病毒界", phylum: "被膜病毒门", class: "疱疹病毒纲", order: "疱疹病毒目", family: "疱疹病毒科", genus: "水痘病毒属", species: "水痘带状疱疹病毒", note: ""},
+            {id: "PI_nanovirus", domain: "灵质病毒域", kingdom: "机械病毒界", phylum: "人工病毒形态门", class: "数字病毒纲", order: "噬菌体形目", family: "纳米病毒科", genus: "纳米噬体属", species: "纳米病毒", note: "虚构"},
+            {id: "PI_nyancatvirus", domain: "灵质病毒域", kingdom: "机械病毒界", phylum: "人工病毒形态门", class: "数字病毒纲", order: "彩虹猫病毒目", family: "彩虹猫病毒目", genus: "彩虹猫病毒属", species: "彩虹猫病毒", note: "虚构"},
+            {id: "PI_ringvirus", domain: "灵质病毒域", kingdom: "灵异病毒界", phylum: "隐态病毒门", class: "环界病毒纲", order: "铃病毒目", family: "铃病毒科", genus: "铃病毒属", species: "铃病毒", note: "虚构"},
+            {id: "PI_fungus", domain: "真核域", kingdom: "", phylum: "", class: "", order: "", family: "", genus: "", species: "真菌", note: ""},
+            {id: "PI_aspergillus", domain: "真核域", kingdom: "真菌界", phylum: "子囊菌门", class: "散囊菌纲", order: "散囊菌目", family: "曲霉科", genus: "曲霉属", species: "黄曲霉菌", note: ""},
+            {id: "PI_dermatophyte", domain: "真核域", kingdom: "真菌界", phylum: "子囊菌门", class: "散囊菌纲", order: "爪甲团囊菌目", family: "节皮菌科", genus: "毛癣菌属", species: "红色毛癣菌", note: ""},
+            {id: "PI_candida", domain: "真核域", kingdom: "真菌界", phylum: "子囊菌门", class: "酵母纲", order: "酵母目", family: "酵母科", genus: "念珠菌属", species: "白色念珠菌", note: ""},
+            {id: "PI_parasite", domain: "真核域", kingdom: "", phylum: "", class: "", order: "", family: "", genus: "", species: "寄生虫", note: ""},
+            {id: "PI_plasmodium", domain: "真核域", kingdom: "古虫界", phylum: "顶复门", class: "孢子虫纲", order: "真球虫目", family: "疟原虫科", genus: "疟原虫属", species: "恶性疟原虫", note: ""},
+            {id: "PI_toxoplasma", domain: "真核域", kingdom: "古虫界", phylum: "顶复门", class: "孢子虫纲", order: "真球虫目", family: "肉孢子虫科", genus: "弓形虫属", species: "刚地弓形虫", note: ""},
+            {id: "PI_amoeba", domain: "真核域", kingdom: "古虫界", phylum: "透色门", class: "根足虫纲", order: "裂芡目", family: "简变科", genus: "耐格里属", species: "福氏耐格里变形虫", note: ""},
+            {id: "PI_schistosoma", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "吸虫纲", order: "复殖目", family: "裂体科", genus: "裂体属", species: "日本裂体吸虫", note: ""},
+            {id: "PI_paragonimus", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "吸虫纲", order: "复殖目", family: "并殖科", genus: "并殖属", species: "卫氏并殖吸虫", note: ""},
+            {id: "PI_pagumogonimus", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "吸虫纲", order: "复殖目", family: "并殖科", genus: "狸殖属", species: "斯氏狸殖吸虫", note: ""},
+            {id: "PI_fasciolopsis", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "吸虫纲", order: "复殖目", family: "片形科", genus: "姜片属", species: "布氏姜片吸虫", note: ""},
+            {id: "PI_clonorchis", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "吸虫纲", order: "后睾目", family: "后睾科", genus: "支睾属", species: "中华分支睾吸虫", note: ""},
+            {id: "PI_distome", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "吸虫纲", order: "斜睾目", family: "彩蚴科", genus: "彩蚴属", species: "双盘吸虫", note: ""},
+            {id: "PI_leucochloridium", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "吸虫纲", order: "斜睾目", family: "彩蚴科", genus: "彩蚴属", species: "中华彩蚴吸虫", note: ""},
+            {id: "PI_sparganum", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "绦虫纲", order: "假叶目", family: "裂头科", genus: "迭宫属", species: "曼氏迭宫绦虫", note: ""},
+            {id: "PI_echinococcus", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "绦虫纲", order: "圆叶目", family: "带科", genus: "棘球属", species: "细粒棘球绦虫", note: ""},
+            {id: "PI_alveococcus", domain: "真核域", kingdom: "动物界", phylum: "扁形动物门", class: "绦虫纲", order: "圆叶目", family: "带科", genus: "棘球属", species: "多房棘球绦虫", note: ""},
+            {id: "PI_angiostrongylus", domain: "真核域", kingdom: "动物界", phylum: "线虫动物门", class: "线虫纲", order: "圆线虫目", family: "管圆科", genus: "管圆线虫属", species: "广州管圆线虫", note: ""},
+            {id: "PI_ancylostoma", domain: "真核域", kingdom: "动物界", phylum: "线虫动物门", class: "线虫纲", order: "圆线虫目", family: "钩口科", genus: "钩口属", species: "十二指肠钩虫", note: ""},
+            {id: "PI_trichuris", domain: "真核域", kingdom: "动物界", phylum: "线虫动物门", class: "线虫纲", order: "鞭尾目", family: "毛尾科", genus: "鞭虫属", species: "毛首鞭形线虫", note: ""},
+            {id: "PI_ascaris", domain: "真核域", kingdom: "动物界", phylum: "线虫动物门", class: "线虫纲", order: "蛔虫目", family: "蛔虫科", genus: "蛔虫属", species: "似蚓蛔线虫", note: ""},
+            {id: "PI_gordius", domain: "真核域", kingdom: "动物界", phylum: "线形动物门", class: "铁线虫纲", order: "铁线虫目", family: "铁线虫科", genus: "铁线虫属", species: "戈尔迪乌斯线虫", note: ""},
+            {id: "PI_neurax", domain: "真核域", kingdom: "动物界", phylum: "环节动物门", class: "多毛纲", order: "神经毡目", family: "神经轴科", genus: "神经轴属", species: "神经蠕虫", note: "虚构"},
+            {id: "PI_neurie", domain: "真核域", kingdom: "动物界", phylum: "环节动物门", class: "多毛纲", order: "神经毡目", family: "神经轴科", genus: "神经轴属", species: "圣诞蠕虫", note: "虚构"},
+            {id: "PI_prion", domain: "无", kingdom: "无", phylum: "无", class: "无", order: "无", family: "无", genus: "无", species: "毒朊蛋白", note: ""},
+            {id: "PI_creutzfeldtjacobdisease", domain: "无", kingdom: "无", phylum: "无", class: "无", order: "无", family: "无", genus: "无", species: "羊瘙痒病朊蛋白", note: ""},
+            {id: "PI_fatalfamilialinsomnia", domain: "无", kingdom: "无", phylum: "无", class: "无", order: "无", family: "无", genus: "无", species: "D178N突变型朊蛋白", note: ""},
+            {id: "PI_biologicalweapon", domain: "无", kingdom: "无", phylum: "无", class: "无", order: "无", family: "无", genus: "无", species: "生物武器", note: ""},
+            {id: "PI_shadowplague", domain: "无", kingdom: "无", phylum: "无", class: "无", order: "无", family: "无", genus: "无", species: "暗影瘟疫", note: "虚构"},
+            {id: "PI_unknownpathogen", domain: "无", kingdom: "无", phylum: "无", class: "无", order: "无", family: "无", genus: "无", species: "未知病原", note: "虚构"},
+            {id: "PI_athenianplague", domain: "无", kingdom: "无", phylum: "无", class: "无", order: "无", family: "无", genus: "无", species: "雅典大瘟疫", note: ""},
+            {id: "PI_porphyria", domain: "无", kingdom: "无", phylum: "无", class: "无", order: "无", family: "无", genus: "无", species: "卟啉症", note: ""}
+        ];
+        
+        // 图片路径映射
+        const imageMap = {
+            // 多人病原体共享图片
+            "PI_ancylostoma": "PI_ancylostomatrichuris.jpg",
+            "PI_trichuris": "PI_ancylostomatrichuris.jpg",
+            "PI_ebolavirus": "PI_filovirus.jpg",
+            "PI_marburgvirus": "PI_filovirus.jpg",
+            "PI_lactobacillus": "PI_lactobacillusacetobacter.jpg",
+            "PI_acetobacter": "PI_lactobacillusacetobacter.jpg",
+            "PI_pneumococcus": "PI_streptococcus.jpg",
+            "PI_pyococcus": "PI_streptococcus.jpg",
+            "PI_flavivirus": "PI_yellowfever.jpg",
+            "PI_zikavirus": "PI_yellowfever.jpg",
+            "PI_mycoplasma":"PI_mycoplasmachlamydia.jpg",
+            "PI_chlamydia":"PI_mycoplasmachlamydia.jpg",
+        };
+
+         // 超链接映射表
+        const linkMap = {
+            "PI_bacteria": "https://plagueinc.wiki.gg/wiki/Bacteria",
+            "PI_staphylococcusaureus":"http://www.a-hospital.com/w/%E9%87%91%E9%BB%84%E8%89%B2%E8%91%A1%E8%90%84%E7%90%83%E8%8F%8C",
+            "PI_pneumococcus":"https://www.yixue.com/%E5%8C%BB%E5%AD%A6%E5%BE%AE%E7%94%9F%E7%89%A9%E5%AD%A6/%E8%82%BA%E7%82%8E%E7%90%83%E8%8F%8C",
+            "PI_pyococcus":"https://www.yixue.com/%E9%93%BE%E7%90%83%E8%8F%8C",
+            "PI_lactobacillus":"https://www.yixue.com/%E4%B9%B3%E9%85%B8%E8%8F%8C",
+            "PI_anthrax":"https://www.yixue.com/%E7%82%AD%E7%96%BD",
+            "PI_tetanus":"https://www.yixue.com/%E7%A0%B4%E4%BC%A4%E9%A3%8E",
+            "PI_diphtheria":"https://www.yixue.com/%E7%99%BD%E5%96%89",
+            "PI_tuberculosis":"https://www.yixue.com/%E7%BB%93%E6%A0%B8",
+            "PI_leprosy":"https://www.yixue.com/%E9%BA%BB%E9%A3%8E%E7%97%85",
+            "PI_acetobacter":"https://baike.baidu.com/item/%E9%86%8B%E9%85%B8%E8%8F%8C?fromModule=lemma_search-box",
+            "PI_rickettsia":"https://www.yixue.com/%E7%AB%8B%E5%85%8B%E6%AC%A1%E6%B0%8F%E4%BD%93",
+            "PI_brucella":"https://www.yixue.com/%E5%B8%83%E6%B0%8F%E6%9D%86%E8%8F%8C%E7%97%85",
+            "PI_gonorrhea":"https://www.yixue.com/%E6%B7%8B%E7%97%85",
+            "PI_pertussis":"https://www.yixue.com/%E7%99%BE%E6%97%A5%E5%92%B3",
+            "PI_cholera":"https://www.yixue.com/%E9%9C%8D%E4%B9%B1",
+            "PI_vibriovulnificus":"https://baike.baidu.com/item/%E5%88%9B%E4%BC%A4%E5%BC%A7%E8%8F%8C?fromModule=lemma_search-box",
+            "PI_typhoid":"https://www.yixue.com/%E4%BC%A4%E5%AF%92",
+            "PI_bubonicplague": "https://www.yixue.com/%E8%85%BA%E9%BC%A0%E7%96%AB",
+            "PI_pestilence": "https://plagueinc.wiki.gg/wiki/Black_Death",
+            "PI_escherichiacoli":"https://www.yixue.com/%E5%A4%A7%E8%82%A0%E6%9D%86%E8%8F%8C",
+            "PI_helicobacterpylori":"https://www.yixue.com/%E5%B9%BD%E9%97%A8%E8%9E%BA%E6%9D%86%E8%8F%8C",
+            "PI_syphilis":"https://www.yixue.com/%E6%A2%85%E6%AF%92",
+            "PI_mycoplasma":"https://www.yixue.com/%E6%94%AF%E5%8E%9F%E4%BD%93",
+            "PI_chlamydia":"https://www.yixue.com/%E8%A1%A3%E5%8E%9F%E4%BD%93",
+            "PI_virus": "https://plagueinc.wiki.gg/wiki/Virus",
+            "PI_dengue":"https://www.yixue.com/%E7%99%BB%E9%9D%A9%E7%83%AD",
+            "PI_westnilevirus":"https://www.yixue.com/%E8%A5%BF%E5%B0%BC%E7%BD%97%E6%B2%B3%E7%83%AD",
+            "PI_flavivirus":"https://www.yixue.com/%E9%BB%84%E7%83%AD%E7%97%85",
+            "PI_zikavirus":"https://www.yixue.com/%E5%AF%A8%E5%8D%A1%E7%97%85%E6%AF%92",
+            "PI_poliomyelitis":"https://www.yixue.com/%E8%84%8A%E9%AB%93%E7%81%B0%E8%B4%A8%E7%82%8E",
+            "PI_rhinovirus":"https://www.yixue.com/%E9%BC%BB%E7%97%85%E6%AF%92",
+            "PI_coxsackievirus":"https://www.yixue.com/%E6%9F%AF%E8%90%A8%E5%A5%87%E7%97%85%E6%AF%92",
+            "PI_norovirus":"http://www.a-hospital.com/w/%E8%AF%BA%E5%A6%82%E7%97%85%E6%AF%92",
+            "PI_necroa":"https://plagueinc.wiki.gg/wiki/Necroa_Virus",
+            "PI_lassavirus":"https://www.yixue.com/%E6%8B%89%E6%B2%99%E7%83%AD",
+            "PI_hantavirus":"https://www.yixue.com/%E6%B1%89%E5%9D%A6%E7%97%85%E6%AF%92",
+            "PI_avianinfluenza":"https://www.yixue.com/%E7%A6%BD%E6%B5%81%E6%84%9F",
+            "PI_spanishinfluenza":"https://baike.baidu.com/item/1918%E5%B9%B4%E8%A5%BF%E7%8F%AD%E7%89%99%E5%A4%A7%E6%B5%81%E6%84%9F?fromtitle=%E8%A5%BF%E7%8F%AD%E7%89%99%E6%B5%81%E6%84%9F&fromid=7366227&fromModule=lemma_search-box",
+            "PI_swineflu":"https://plagueinc.wiki.gg/wiki/Swine_Flu",
+            "PI_measles":"https://www.yixue.com/%E9%BA%BB%E7%96%B9",
+            "PI_nipahvirus":"https://plagueinc.wiki.gg/wiki/Nipah_Virus",
+            "PI_rabies":"https://www.yixue.com/%E7%8B%82%E7%8A%AC%E7%97%85",
+            "PI_ebolavirus":"https://www.yixue.com/%E5%9F%83%E5%8D%9A%E6%8B%89%E7%97%85%E6%AF%92",
+            "PI_marburgvirus":"https://www.yixue.com/%E9%A9%AC%E5%B0%94%E5%A0%A1%E5%87%BA%E8%A1%80%E7%83%AD",
+            "PI_simianflu":"https://plagueinc.wiki.gg/wiki/Simian_Flu",
+            "PI_aids":"https://www.yixue.com/%E8%89%BE%E6%BB%8B%E7%97%85",
+            "PI_pithovirus":"https://plagueinc.wiki.gg/wiki/Frozen_Virus",
+            "PI_smallpox": "https://plagueinc.wiki.gg/wiki/Smallpox",
+            "PI_mpoxvirus":"https://www.yixue.com/%E7%8C%B4%E7%97%98",
+            "PI_papillomavirus":"https://www.yixue.com/%E4%BA%BA%E4%B9%B3%E5%A4%B4%E7%98%A4%E7%97%85%E6%AF%92",
+            "PI_varicella":"https://www.yixue.com/%E6%B0%B4%E7%97%98",
+            "PI_nanovirus": "https://plagueinc.wiki.gg/wiki/Nano-Virus",
+            "PI_nyancatvirus":"https://malware.fandom.com/zh/wiki/MEMZ#:~:text=MEMZ%E6%98%AF%E4%B8%80%E7%A7%8D%E5%AD%98%E5%9C%A8%E4%BA%8E%E5%BE%AE%E8%BD%AFWindows%EE%80%80%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E8%87%AA%E5%88%B6%E6%9C%A8%E9%A9%AC%E7%97%85%E6%AF%92%EF%BC%8C%E5%8E%9F%E6%9C%AC%E6%98%AF%E4%B8%BA%E4%BA%86Danooct1%E7%9A%84%EE%80%81%E2%80%9C%E8%A7%82%E8%B5%8F%E6%80%A7%E6%81%B6%E6%84%8F%E8%BD%AF%E4%BB%B6%E2%80%9D%E8%A7%86%E9%A2%91%E7%B3%BB%E5%88%97%E5%92%8C%E5%98%B2%E8%AE%BD%E9%82%A3%E4%BA%9B%E2%80%9C%E7%8E%A9%E5%85%B7%E7%97%85%E6%AF%92%E2%80%9D%E8%80%8C%E5%88%B6%E4%BD%9C%E3%80%82%E5%9B%A0%E5%85%B6%E9%AB%98%E5%BA%A6%E5%A4%8D%E6%9D%82%E5%92%8C%E7%8B%AC%E7%89%B9%E7%9A%84%E6%84%9F%E6%9F%93%E7%89%B9%E5%BE%81%EF%BC%88%E5%A4%A7%E5%A4%9A%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3%EF%BC%89%E5%A4%87%E5%8F%97%E5%85%B3%E6%B3%A8%E5%92%8C%E8%B4%A3",
+            "PI_ringvirus":"https://baike.baidu.com/item/RING%E7%97%85%E6%AF%92/8920046?fromModule=search-result_lemma",
+            "PI_fungus": "https://plagueinc.wiki.gg/wiki/Fungus",
+            "PI_aspergillus":"http://www.a-hospital.com/w/%E9%BB%84%E6%9B%B2%E9%9C%89",
+            "PI_dermatophyte":"https://baike.baidu.com/item/%E7%BA%A2%E8%89%B2%E6%AF%9B%E7%99%A3%E8%8F%8C?fromModule=lemma_search-box",
+            "PI_candida":"http://www.a-hospital.com/w/%E5%8C%BB%E5%AD%A6%E5%BE%AE%E7%94%9F%E7%89%A9%E5%AD%A6/%E7%99%BD%E8%89%B2%E5%BF%B5%E7%8F%A0%E8%8F%8C",
+             "PI_parasite": "https://plagueinc.wiki.gg/wiki/Parasite",
+            "PI_plasmodium":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E7%96%9F%E5%8E%9F%E8%99%AB",
+            "PI_toxoplasma":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E5%88%9A%E5%9C%B0%E5%BC%93%E5%BD%A2%E8%99%AB",
+            "PI_amoeba":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E8%87%B4%E7%97%85%E6%80%A7%E8%87%AA%E7%94%9F%E7%94%9F%E6%B4%BB%E9%98%BF%E7%B1%B3%E5%B7%B4",
+            "PI_schistosoma":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E8%A1%80%E5%90%B8%E8%99%AB",
+            "PI_paragonimus":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E5%8D%AB%E6%B0%8F%E5%B9%B6%E6%AE%96%E5%90%B8%E8%99%AB",
+            "PI_pagumogonimus":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E6%96%AF%E6%B0%8F%E7%8B%B8%E6%AE%96%E5%90%B8%E8%99%AB",
+            "PI_fasciolopsis":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E5%B8%83%E6%B0%8F%E5%A7%9C%E7%89%87%E8%99%AB",
+            "PI_clonorchis":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E5%8D%8E%E6%94%AF%E7%9D%BE%E5%90%B8%E8%99%AB",
+            "PI_distome":"https://baike.baidu.com/item/%E5%8F%8C%E7%9B%98%E5%90%B8%E8%99%AB/5380181",
+            "PI_leucochloridium":"https://baike.baidu.com/item/%E4%B8%AD%E5%8D%8E%E5%BD%A9%E8%9A%B4%E5%90%B8%E8%99%AB/63154245?fromModule=search-result_lemma-recommend",
+            "PI_sparganum":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E6%9B%BC%E6%B0%8F%E8%BF%AD%E5%AE%AB%E7%BB%A6%E8%99%AB",
+            "PI_echinococcus":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E7%BB%86%E7%B2%92%E6%A3%98%E7%90%83%E7%BB%A6%E8%99%AB",
+            "PI_alveococcus":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E5%A4%9A%E6%88%BF%E6%A3%98%E7%90%83%E7%BB%A6%E8%99%AB",
+            "PI_angiostrongylus":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E5%85%B6%E4%BB%96%E4%BA%BA%E4%BD%93%E5%AF%84%E7%94%9F%E7%BA%BF%E8%99%AB",
+            "PI_ancylostoma":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E5%8D%81%E4%BA%8C%E6%8C%87%E8%82%A0%E9%92%A9%E5%8F%A3%E7%BA%BF%E8%99%AB%E5%92%8C%E7%BE%8E%E6%B4%B2%E6%9D%BF%E5%8F%A3%E7%BA%BF%E8%99%AB",
+            "PI_trichuris":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E6%AF%9B%E9%A6%96%E9%9E%AD%E5%BD%A2%E7%BA%BF%E8%99%AB",
+            "PI_ascaris":"https://www.yixue.com/%E5%AF%84%E7%94%9F%E8%99%AB%E5%AD%A6/%E4%BC%BC%E8%9A%93%E8%9B%94%E7%BA%BF%E8%99%AB",
+            "PI_gordius":"https://baike.baidu.com/item/%E9%93%81%E7%BA%BF%E8%99%AB/2387095",
+            "PI_neurax":"https://plagueinc.wiki.gg/wiki/Neurax_Worm",
+            "PI_neurie":"https://plagueinc.wiki.gg/wiki/Santa%27s_Little_Helper",
+            "PI_prion": "https://plagueinc.wiki.gg/wiki/Prion",
+            "PI_creutzfeldtjacobdisease":"https://plagueinc.wiki.gg/wiki/Mad_Cow_Disease",
+            "PI_fatalfamilialinsomnia":"https://baike.baidu.com/item/%E8%87%B4%E6%AD%BB%E6%80%A7%E5%AE%B6%E6%97%8F%E6%80%A7%E5%A4%B1%E7%9C%A0%E7%97%87?fromtitle=%E8%87%B4%E6%AD%BB%E6%80%A7%E5%AE%B6%E6%97%8F%E5%A4%B1%E7%9C%A0%E7%97%87&fromid=15747312&fromModule=lemma_search-box",
+            "PI_biologicalweapon": "https://plagueinc.wiki.gg/wiki/Bio-Weapon",
+            "PI_shadowplague":"https://plagueinc.wiki.gg/wiki/Shadow_Plague",
+            "PI_unknownpathogen":"https://plagueinc.wiki.gg/wiki/Unknown_Origin",
+            "PI_athenianplague":"https://baike.baidu.com/item/%E9%9B%85%E5%85%B8%E5%A4%A7%E7%98%9F%E7%96%AB?fromModule=lemma_search-box",
+            "PI_porphyria":"https://www.yixue.com/%E5%8D%9F%E5%95%89%E7%97%85",
+        };
+         
+            // 轮播功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            const indicatorsContainer = document.querySelector('.slideshow-indicators');
+            let currentSlide = 0;
+            let slideInterval;
+            
+            // 创建指示器
+            slides.forEach((_, index) => {
+                const indicator = document.createElement('div');
+                indicator.classList.add('indicator');
+                if (index === 0) indicator.classList.add('active');
+                indicator.dataset.index = index;
+                indicator.setAttribute('tabindex', '-1');
+                indicator.addEventListener('click', () => {
+                    // 立即切换，不使用过渡效果
+                    goToSlideImmediate(index);
+                    resetInterval(); // 点击后重置自动轮播
+                });
+                
+                indicatorsContainer.appendChild(indicator);
+            });
+            
+            const indicators = document.querySelectorAll('.indicator');
+            
+            // 立即切换到指定幻灯片（无过渡效果）
+            function goToSlideImmediate(n) {
+                // 隐藏当前幻灯片
+                slides[currentSlide].classList.remove('active');
+                indicators[currentSlide].classList.remove('active');
+                
+                // 更新当前幻灯片索引
+                currentSlide = n;
+                
+                // 显示新幻灯片
+                slides[currentSlide].classList.add('active');
+                indicators[currentSlide].classList.add('active');
+            }
+            
+            // 平滑切换到指定幻灯片（有过渡效果）
+            function goToSlideSmooth(n) {
+                // 隐藏当前幻灯片
+                slides[currentSlide].classList.remove('active');
+                indicators[currentSlide].classList.remove('active');
+                
+                // 更新当前幻灯片索引
+                currentSlide = n;
+                
+                // 显示新幻灯片
+                slides[currentSlide].classList.add('active');
+                indicators[currentSlide].classList.add('active');
+            }
+            
+            // 下一张幻灯片
+            function nextSlide() {
+                // 计算下一张幻灯片索引，确保循环正确
+                let next = currentSlide + 1;
+                if (next >= slides.length) {
+                    next = 0; // 循环回第一张
+                }
+                goToSlideSmooth(next);
+            }
+            
+            // 重置自动轮播计时器
+            function resetInterval() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 5000);
+            }
+            
+            // 初始启动自动轮播
+            resetInterval();
+            
+            // 添加鼠标悬停暂停功能
+            const header = document.querySelector('header');
+            header.addEventListener('mouseenter', () => {
+                clearInterval(slideInterval);
+            });
+            
+            header.addEventListener('mouseleave', () => {
+                resetInterval();
+            });
+        });
+
+        // 渲染表格
+        function renderTable(data) {
+            const tableBody = document.getElementById('pathogenTable');
+            tableBody.innerHTML = '';
+            
+            data.forEach(pathogen => {
+                const row = document.createElement('tr');
+                
+                // 现实病原体样式
+                if (pathogen.domain === "细菌域") row.classList.add('domain-bacteria');
+                else if (pathogen.domain.includes("病毒")) row.classList.add('domain-virus');
+                else if (pathogen.domain === "真核域" && pathogen.species.includes("菌")) row.classList.add('domain-eukarya');
+                else if (pathogen.domain === "真核域"&&pathogen.species.includes("虫")) row.classList.add('domain-parasite');
+                else if (pathogen.species.includes("蛋白")) row.classList.add('domain-prion');
+                else if (pathogen.domain === "无") row.classList.add('domain-none');
+                
+                // 虚构病原体样式
+                if (pathogen.note === "虚构") row.classList.add('fictional');
+                let noteCell = pathogen.note;
+                if (pathogen.note === "阳性") {
+                    noteCell = `<span class="gram-positive">${pathogen.note}</span>`;
+                } else if (pathogen.note === "阴性") {
+                    noteCell = `<span class="gram-negative">${pathogen.note}</span>`;
+                }
+                
+                row.innerHTML = `
+                    <td data-id="${pathogen.id}">${pathogen.id}</td>
+                    <td>${pathogen.domain}</td>
+                    <td>${pathogen.kingdom}</td>
+                    <td>${pathogen.phylum}</td>
+                    <td>${pathogen.class}</td>
+                    <td>${pathogen.order}</td>
+                    <td>${pathogen.family}</td>
+                    <td>${pathogen.genus}</td>
+                    <td>${pathogen.species}</td>
+                    <td>${noteCell}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // 悬停事件监听器
+            addHoverListeners();
+
+            // 点击事件监听器
+            addClickListeners();
+        }
+        
+        function addHoverListeners() {
+            const idCells = document.querySelectorAll('td[data-id]');
+            const tooltip = document.getElementById('imageTooltip');
+            const tooltipImg = tooltip.querySelector('img');
+            const tooltipTitle = tooltip.querySelector('.tooltip-title');
+            
+            idCells.forEach(cell => {
+                cell.addEventListener('mouseenter', function(e) {
+                    const id = this.getAttribute('data-id');
+                    const pathogen = pathogens.find(p => p.id === id);
+                    
+                    if (pathogen) {
+                        // 确定图片文件名
+                        let imageFile = imageMap[id] || `${id}.jpg`;
+                        
+                        // 构建图片路径
+                        const imagePath = `image/character/${imageFile}`;
+                        
+                        // 设置图片和标题
+                        tooltipImg.src = imagePath;
+                        tooltipImg.alt = pathogen.species;
+                        tooltipTitle.textContent = pathogen.species;
+                        
+                        // 显示工具提示
+                        tooltip.style.display = 'block';
+                        
+                        // 定位工具提示（避免超出屏幕边界）
+                        positionTooltip(tooltip, e);
+                    }
+                });
+                
+                cell.addEventListener('mousemove', function(e) {
+                    // 更新工具提示位置
+                    positionTooltip(tooltip, e);
+                });
+                
+                cell.addEventListener('mouseleave', function() {
+                    // 隐藏工具提示
+                    tooltip.style.display = 'none';
+                });
+            });
+        }
+
+         function addClickListeners() {
+            const idCells = document.querySelectorAll('td[data-id]');
+            const audioElement = document.getElementById('clickSound');
+            
+            idCells.forEach(cell => {
+                cell.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    
+                    // 播放点击声音
+                    if (audioElement) {
+                        audioElement.currentTime = 0;
+                        audioElement.play().catch(e => {
+                            console.log("音频播放失败:", e);
+                        });
+                    }
+                    
+                    // 检查是否有对应的链接
+                    if (linkMap.hasOwnProperty(id)) {
+                        // 在新窗口打开链接
+                        window.open(linkMap[id], '_blank');
+                    } else {
+                        // 如果没有特定链接，尝试使用通用链接
+                        const pathogen = pathogens.find(p => p.id === id);
+                        if (pathogen) {
+                            if (genericLink) {
+                                window.open(genericLink, '_blank');
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
+        // 定位工具提示（避免超出屏幕边界）
+        function positionTooltip(tooltip, e) {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const tooltipWidth = tooltip.offsetWidth;
+            const tooltipHeight = tooltip.offsetHeight;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // 默认位置：鼠标右下方
+            let left = mouseX + 15;
+            let top = mouseY + 15;
+            
+            // 检查右侧边界
+            if (left + tooltipWidth > windowWidth) {
+                left = mouseX - tooltipWidth - 15;
+            }
+            
+            // 检查底部边界
+            if (top + tooltipHeight > windowHeight) {
+                top = mouseY - tooltipHeight - 15;
+            }
+            
+            // 检查左侧边界
+            if (left < 0) {
+                left = 15;
+            }
+            
+            // 检查顶部边界,确保不会在顶部被遮挡
+            if (top < 0) {
+                top = 15;
+            }
+            
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+        }
+        
+        // 初始渲染
+        renderTable(pathogens);
+        
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            const domainFilter = document.getElementById('domainFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            
+            const filteredData = pathogens.filter(pathogen => {
+                // 搜索文本匹配
+                const matchesSearch = Object.values(pathogen).some(value => 
+                    value && value.toString().toLowerCase().includes(searchText)
+                );
+                
+                // 域过滤
+                const matchesDomain = domainFilter ? pathogen.domain === domainFilter : true;
+                
+                // 类型过滤
+                let matchesType = true;
+                if (typeFilter === "虚构") {
+                    matchesType = pathogen.note === "虚构";
+                } else if (typeFilter === "真实") {
+                    matchesType = pathogen.note !== "虚构";
+                }
+                
+                return matchesSearch && matchesDomain && matchesType;
+            });
+            
+            renderTable(filteredData);
+        });
+        
+        // 域过滤
+        document.getElementById('domainFilter').addEventListener('change', function() {
+            document.getElementById('searchInput').dispatchEvent(new Event('input'));
+        });
+        
+        // 类型过滤
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            document.getElementById('searchInput').dispatchEvent(new Event('input'));
+        });
+        // 生成树状图
+        // 在病原体分类.html中修改按钮点击事件
+        document.getElementById('showTreeChart').addEventListener('click', function() {
+    // 将数据存入localStorage
+        localStorage.setItem('pathogensData', JSON.stringify(pathogens));
+        localStorage.setItem('linkMapData', JSON.stringify(linkMap));
+    
+    // 跳转到新页面
+        window.open('病原体分类树.html', '_blank');
+});
+    </script>
+</body>
+</html>

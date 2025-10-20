@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病原体分类树状图</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            font-family: "STKaiti", "华文楷体", serif;
+            margin: 0;
+            padding: 20px;
+            color: white;
+            font-size: 16px;
+            background: rgb(120, 120, 120);
+            background-image: url('image/background/Red_Bg_01.png');
+            background-size: cover;
+        }
+        .container {
+            max-width: 2000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-image: url('image/background/Red_Bg_01.png');
+            background-size: cover;
+        }
+        h1 {
+            text-align: center;
+            color: #ff8c8c;
+            margin-bottom: 40px;
+        }
+        #treeChart {
+            width: 100%;
+            height: 700px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .controls {
+            margin: 15px 0;
+            text-align: center;
+        }
+        button {
+            padding: 8px 16px;
+            background: #db3434;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        button:hover {
+            background: #b52a2a;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>病原体分类树状图</h1>
+        
+        <div class="controls">
+            <button id="expandAll">展开所有</button>
+            <button id="collapseAll">折叠所有</button>
+            <button id="resetView">重置视图</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffffbb;"></div>
+                <span>细菌域</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #bfe4ff;"></div>
+                <span>病毒域</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #fbd3df;"></div>
+                <span>真核域-真菌</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f3c4a5;"></div>
+                <span>真核域-寄生虫</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #c2f7ac;"></div>
+                <span>朊病毒</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e0e0e0;"></div>
+                <span>虚构病原体</span>
+            </div>
+        </div>
+        
+        <div id="treeChart"></div>
+    </div>
+
+    <script>
+        // 从localStorage获取数据
+        const pathogens = JSON.parse(localStorage.getItem('pathogensData') || '[]');
+        const linkMap = JSON.parse(localStorage.getItem('linkMapData') || '{}');
+        
+        // 如果没有数据，显示错误信息
+        if (pathogens.length === 0) {
+            document.getElementById('treeChart').innerHTML = 
+                '<div style="text-align:center;padding:50px;color:red;">无法加载数据，请从病原体分类表页面打开此功能</div>';
+            throw new Error("没有病原体数据");
+        }
+        
+        // 初始化 ECharts 实例
+        const chartDom = document.getElementById('treeChart');
+        const myChart = echarts.init(chartDom);
+        
+        // 生成完整的病原体分类树状图数据
+        function buildTreeData() {
+            // 创建根节点
+            const root = {
+                name: '病原体',
+                children: []
+            };
+            
+            // 使用Map来存储已创建的节点，避免重复
+            const domainMap = new Map();
+            const kingdomMap = new Map();
+            const phylumMap = new Map();
+            const classMap = new Map();
+            const orderMap = new Map();
+            const familyMap = new Map();
+            const genusMap = new Map();
+            
+            // 处理每个病原体
+            pathogens.forEach(pathogen => {
+                if (pathogen.domain === "无") return; // 跳过无分类的
+                
+                // 处理域节点
+                let domainNode = domainMap.get(pathogen.domain);
+                if (!domainNode) {
+                    domainNode = {
+                        name: pathogen.domain,
+                        children: [],
+                        domainColor: getDomainStyle(pathogen.domain) 
+                    };
+                    domainMap.set(pathogen.domain, domainNode);
+                    root.children.push(domainNode);
+                }
+                
+                // 处理界节点
+                if (pathogen.kingdom) {
+                    const kingdomKey = pathogen.domain + '|' + pathogen.kingdom;
+                    let kingdomNode = kingdomMap.get(kingdomKey);
+                    if (!kingdomNode) {
+                        kingdomNode = {
+                            name: pathogen.kingdom,
+                            children: []
+                        };
+                        kingdomMap.set(kingdomKey, kingdomNode);
+                        domainNode.children.push(kingdomNode);
+                    }
+                    
+                    // 处理门节点
+                    if (pathogen.phylum) {
+                        const phylumKey = kingdomKey + '|' + pathogen.phylum;
+                        let phylumNode = phylumMap.get(phylumKey);
+                        if (!phylumNode) {
+                            phylumNode = {
+                                name: pathogen.phylum,
+                                children: []
+                            };
+                            phylumMap.set(phylumKey, phylumNode);
+                            kingdomNode.children.push(phylumNode);
+                        }
+                        
+                        // 处理纲节点
+                        if (pathogen.class) {
+                            const classKey = phylumKey + '|' + pathogen.class;
+                            let classNode = classMap.get(classKey);
+                            if (!classNode) {
+                                classNode = {
+                                    name: pathogen.class,
+                                    children: []
+                                };
+                                classMap.set(classKey, classNode);
+                                phylumNode.children.push(classNode);
+                            }
+                            
+                            // 处理目节点
+                            if (pathogen.order) {
+                                const orderKey = classKey + '|' + pathogen.order;
+                                let orderNode = orderMap.get(orderKey);
+                                if (!orderNode) {
+                                    orderNode = {
+                                        name: pathogen.order,
+                                        children: []
+                                    };
+                                    orderMap.set(orderKey, orderNode);
+                                    classNode.children.push(orderNode);
+                                }
+                                
+                                // 处理科节点
+                                if (pathogen.family) {
+                                    const familyKey = orderKey + '|' + pathogen.family;
+                                    let familyNode = familyMap.get(familyKey);
+                                    if (!familyNode) {
+                                        familyNode = {
+                                            name: pathogen.family,
+                                            children: []
+                                        };
+                                        familyMap.set(familyKey, familyNode);
+                                        orderNode.children.push(familyNode);
+                                    }
+                                    
+                                    // 处理属节点
+                                    if (pathogen.genus) {
+                                        const genusKey = familyKey + '|' + pathogen.genus;
+                                        let genusNode = genusMap.get(genusKey);
+                                        if (!genusNode) {
+                                            genusNode = {
+                                                name: pathogen.genus,
+                                                children: []
+                                            };
+                                            genusMap.set(genusKey, genusNode);
+                                            familyNode.children.push(genusNode);
+                                        }
+                                        
+                                        // 添加种节点
+                                        if (pathogen.species) {
+                                            genusNode.children.push({
+                                                name: pathogen.species,
+                                                value: 1,
+                                                itemStyle: getNoteStyle(pathogen.note),
+                                                pathogendata: pathogen // 保存原始数据用于交互
+                                            });
+                                        }
+                                    } else if (pathogen.species) {
+                                        // 如果没有属，直接添加到科
+                                        familyNode.children.push({
+                                            name: pathogen.species,
+                                            value: 1,
+                                            itemStyle: getNoteStyle(pathogen.note),
+                                            pathogendata: pathogen
+                                        });
+                                    }
+                                } else if (pathogen.genus) {
+                                    // 如果没有科，但有属
+                                    const genusKey = orderKey + '|' + pathogen.genus;
+                                    let genusNode = genusMap.get(genusKey);
+                                    if (!genusNode) {
+                                        genusNode = {
+                                            name: pathogen.genus,
+                                            children: []
+                                        };
+                                        genusMap.set(genusKey, genusNode);
+                                        orderNode.children.push(genusNode);
+                                    }
+                                    
+                                    // 添加种节点
+                                    if (pathogen.species) {
+                                        genusNode.children.push({
+                                            name: pathogen.species,
+                                            value: 1,
+                                            itemStyle: getNoteStyle(pathogen.note),
+                                            pathogendata: pathogen
+                                        });
+                                    }
+                                } else if (pathogen.species) {
+                                    // 如果没有科和属，直接添加到目
+                                    orderNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.family) {
+                                // 如果没有目，但有科
+                                const familyKey = classKey + '|' + pathogen.family;
+                                let familyNode = familyMap.get(familyKey);
+                                if (!familyNode) {
+                                    familyNode = {
+                                        name: pathogen.family,
+                                        children: []
+                                    };
+                                    familyMap.set(familyKey, familyNode);
+                                    classNode.children.push(familyNode);
+                                }
+                                
+                                // 处理属节点
+                                if (pathogen.genus) {
+                                    const genusKey = familyKey + '|' + pathogen.genus;
+                                    let genusNode = genusMap.get(genusKey);
+                                    if (!genusNode) {
+                                        genusNode = {
+                                            name: pathogen.genus,
+                                            children: []
+                                        };
+                                        genusMap.set(genusKey, genusNode);
+                                        familyNode.children.push(genusNode);
+                                    }
+                                    
+                                    // 添加种节点
+                                    if (pathogen.species) {
+                                        genusNode.children.push({
+                                            name: pathogen.species,
+                                            value: 1,
+                                            itemStyle: getNoteStyle(pathogen.note),
+                                            pathogendata: pathogen
+                                        });
+                                    }
+                                } else if (pathogen.species) {
+                                    // 如果没有属，直接添加到科
+                                    familyNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.genus) {
+                                // 如果没有目和科，但有属
+                                const genusKey = classKey + '|' + pathogen.genus;
+                                let genusNode = genusMap.get(genusKey);
+                                if (!genusNode) {
+                                    genusNode = {
+                                        name: pathogen.genus,
+                                        children: []
+                                    };
+                                    genusMap.set(genusKey, genusNode);
+                                    classNode.children.push(genusNode);
+                                }
+                                
+                                // 添加种节点
+                                if (pathogen.species) {
+                                    genusNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.species) {
+                                // 如果没有目、科和属，直接添加到纲
+                                classNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.order) {
+                            // 如果没有纲，但有目
+                            const orderKey = phylumKey + '|' + pathogen.order;
+                            let orderNode = orderMap.get(orderKey);
+                            if (!orderNode) {
+                                orderNode = {
+                                    name: pathogen.order,
+                                    children: []
+                                };
+                                orderMap.set(orderKey, orderNode);
+                                phylumNode.children.push(orderNode);
+                            }
+                            
+                            // 处理科节点
+                            if (pathogen.family) {
+                                const familyKey = orderKey + '|' + pathogen.family;
+                                let familyNode = familyMap.get(familyKey);
+                                if (!familyNode) {
+                                    familyNode = {
+                                        name: pathogen.family,
+                                        children: []
+                                    };
+                                    familyMap.set(familyKey, familyNode);
+                                    orderNode.children.push(familyNode);
+                                }
+                                
+                                // 处理属节点
+                                if (pathogen.genus) {
+                                    const genusKey = familyKey + '|' + pathogen.genus;
+                                    let genusNode = genusMap.get(genusKey);
+                                    if (!genusNode) {
+                                        genusNode = {
+                                            name: pathogen.genus,
+                                            children: []
+                                        };
+                                        genusMap.set(genusKey, genusNode);
+                                        familyNode.children.push(genusNode);
+                                    }
+                                    
+                                    // 添加种节点
+                                    if (pathogen.species) {
+                                        genusNode.children.push({
+                                            name: pathogen.species,
+                                            value: 1,
+                                            itemStyle: getNoteStyle(pathogen.note),
+                                            pathogendata: pathogen
+                                        });
+                                    }
+                                } else if (pathogen.species) {
+                                    // 如果没有属，直接添加到科
+                                    familyNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.genus) {
+                                // 如果没有科，但有属
+                                const genusKey = orderKey + '|' + pathogen.genus;
+                                let genusNode = genusMap.get(genusKey);
+                                if (!genusNode) {
+                                    genusNode = {
+                                        name: pathogen.genus,
+                                        children: []
+                                    };
+                                    genusMap.set(genusKey, genusNode);
+                                    orderNode.children.push(genusNode);
+                                }
+                                
+                                // 添加种节点
+                                if (pathogen.species) {
+                                    genusNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.species) {
+                                // 如果没有科和属，直接添加到目
+                                orderNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.family) {
+                            // 如果没有纲和目，但有科
+                            const familyKey = phylumKey + '|' + pathogen.family;
+                            let familyNode = familyMap.get(familyKey);
+                            if (!familyNode) {
+                                familyNode = {
+                                    name: pathogen.family,
+                                    children: []
+                                };
+                                familyMap.set(familyKey, familyNode);
+                                phylumNode.children.push(familyNode);
+                            }
+                            
+                            // 处理属节点
+                            if (pathogen.genus) {
+                                const genusKey = familyKey + '|' + pathogen.genus;
+                                let genusNode = genusMap.get(genusKey);
+                                if (!genusNode) {
+                                    genusNode = {
+                                        name: pathogen.genus,
+                                        children: []
+                                    };
+                                    genusMap.set(genusKey, genusNode);
+                                    familyNode.children.push(genusNode);
+                                }
+                                
+                                // 添加种节点
+                                if (pathogen.species) {
+                                    genusNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.species) {
+                                // 如果没有属，直接添加到科
+                                familyNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.genus) {
+                            // 如果没有纲、目和科，但有属
+                            const genusKey = phylumKey + '|' + pathogen.genus;
+                            let genusNode = genusMap.get(genusKey);
+                            if (!genusNode) {
+                                genusNode = {
+                                    name: pathogen.genus,
+                                    children: []
+                                };
+                                genusMap.set(genusKey, genusNode);
+                                phylumNode.children.push(genusNode);
+                            }
+                            
+                            // 添加种节点
+                            if (pathogen.species) {
+                                genusNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.species) {
+                            // 如果没有纲、目、科和属，直接添加到门
+                            phylumNode.children.push({
+                                name: pathogen.species,
+                                value: 1,
+                                itemStyle: getNoteStyle(pathogen.note),
+                                pathogendata: pathogen
+                            });
+                        }
+                    } else if (pathogen.class) {
+                        // 如果没有门，但有纲
+                        const classKey = kingdomKey + '|' + pathogen.class;
+                        let classNode = classMap.get(classKey);
+                        if (!classNode) {
+                            classNode = {
+                                name: pathogen.class,
+                                children: []
+                            };
+                            classMap.set(classKey, classNode);
+                            kingdomNode.children.push(classNode);
+                        }
+                        
+                        // 处理目节点
+                        if (pathogen.order) {
+                            const orderKey = classKey + '|' + pathogen.order;
+                            let orderNode = orderMap.get(orderKey);
+                            if (!orderNode) {
+                                orderNode = {
+                                    name: pathogen.order,
+                                    children: []
+                                };
+                                orderMap.set(orderKey, orderNode);
+                                classNode.children.push(orderNode);
+                            }
+                            
+                            // 处理科节点
+                            if (pathogen.family) {
+                                const familyKey = orderKey + '|' + pathogen.family;
+                                let familyNode = familyMap.get(familyKey);
+                                if (!familyNode) {
+                                    familyNode = {
+                                        name: pathogen.family,
+                                        children: []
+                                    };
+                                    familyMap.set(familyKey, familyNode);
+                                    orderNode.children.push(familyNode);
+                                }
+                                
+                                // 处理属节点
+                                if (pathogen.genus) {
+                                    const genusKey = familyKey + '|' + pathogen.genus;
+                                    let genusNode = genusMap.get(genusKey);
+                                    if (!genusNode) {
+                                        genusNode = {
+                                            name: pathogen.genus,
+                                            children: []
+                                        };
+                                        genusMap.set(genusKey, genusNode);
+                                        familyNode.children.push(genusNode);
+                                    }
+                                    
+                                    // 添加种节点
+                                    if (pathogen.species) {
+                                        genusNode.children.push({
+                                            name: pathogen.species,
+                                            value: 1,
+                                            itemStyle: getNoteStyle(pathogen.note),
+                                            pathogendata: pathogen
+                                        });
+                                    }
+                                } else if (pathogen.species) {
+                                    // 如果没有属，直接添加到科
+                                    familyNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.genus) {
+                                // 如果没有科，但有属
+                                const genusKey = orderKey + '|' + pathogen.genus;
+                                let genusNode = genusMap.get(genusKey);
+                                if (!genusNode) {
+                                    genusNode = {
+                                        name: pathogen.genus,
+                                        children: []
+                                    };
+                                    genusMap.set(genusKey, genusNode);
+                                    orderNode.children.push(genusNode);
+                                }
+                                
+                                // 添加种节点
+                                if (pathogen.species) {
+                                    genusNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.species) {
+                                // 如果没有科和属，直接添加到目
+                                orderNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.family) {
+                            // 如果没有目，但有科
+                            const familyKey = classKey + '|' + pathogen.family;
+                            let familyNode = familyMap.get(familyKey);
+                            if (!familyNode) {
+                                familyNode = {
+                                    name: pathogen.family,
+                                    children: []
+                                };
+                                familyMap.set(familyKey, familyNode);
+                                classNode.children.push(familyNode);
+                            }
+                            
+                            // 处理属节点
+                            if (pathogen.genus) {
+                                const genusKey = familyKey + '|' + pathogen.genus;
+                                let genusNode = genusMap.get(genusKey);
+                                if (!genusNode) {
+                                    genusNode = {
+                                        name: pathogen.genus,
+                                        children: []
+                                    };
+                                    genusMap.set(genusKey, genusNode);
+                                    familyNode.children.push(genusNode);
+                                }
+                                
+                                // 添加种节点
+                                if (pathogen.species) {
+                                    genusNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.species) {
+                                // 如果没有属，直接添加到科
+                                familyNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.genus) {
+                            // 如果没有目和科，但有属
+                            const genusKey = classKey + '|' + pathogen.genus;
+                            let genusNode = genusMap.get(genusKey);
+                            if (!genusNode) {
+                                genusNode = {
+                                    name: pathogen.genus,
+                                    children: []
+                                };
+                                genusMap.set(genusKey, genusNode);
+                                classNode.children.push(genusNode);
+                            }
+                            
+                            // 添加种节点
+                            if (pathogen.species) {
+                                genusNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.species) {
+                            // 如果没有目、科和属，直接添加到纲
+                            classNode.children.push({
+                                name: pathogen.species,
+                                value: 1,
+                                itemStyle: getNoteStyle(pathogen.note),
+                                pathogendata: pathogen
+                            });
+                        }
+                    } else if (pathogen.order) {
+                        // 如果没有门和纲，但有目
+                        const orderKey = kingdomKey + '|' + pathogen.order;
+                        let orderNode = orderMap.get(orderKey);
+                        if (!orderNode) {
+                            orderNode = {
+                                name: pathogen.order,
+                                children: []
+                            };
+                            orderMap.set(orderKey, orderNode);
+                            kingdomNode.children.push(orderNode);
+                        }
+                        
+                        // 处理科节点
+                        if (pathogen.family) {
+                            const familyKey = orderKey + '|' + pathogen.family;
+                            let familyNode = familyMap.get(familyKey);
+                            if (!familyNode) {
+                                familyNode = {
+                                    name: pathogen.family,
+                                    children: []
+                                };
+                                familyMap.set(familyKey, familyNode);
+                                orderNode.children.push(familyNode);
+                            }
+                            
+                            // 处理属节点
+                            if (pathogen.genus) {
+                                const genusKey = familyKey + '|' + pathogen.genus;
+                                let genusNode = genusMap.get(genusKey);
+                                if (!genusNode) {
+                                    genusNode = {
+                                        name: pathogen.genus,
+                                        children: []
+                                    };
+                                    genusMap.set(genusKey, genusNode);
+                                    familyNode.children.push(genusNode);
+                                }
+                                
+                                // 添加种节点
+                                if (pathogen.species) {
+                                    genusNode.children.push({
+                                        name: pathogen.species,
+                                        value: 1,
+                                        itemStyle: getNoteStyle(pathogen.note),
+                                        pathogendata: pathogen
+                                    });
+                                }
+                            } else if (pathogen.species) {
+                                // 如果没有属，直接添加到科
+                                familyNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.genus) {
+                            // 如果没有科，但有属
+                            const genusKey = orderKey + '|' + pathogen.genus;
+                            let genusNode = genusMap.get(genusKey);
+                            if (!genusNode) {
+                                genusNode = {
+                                    name: pathogen.genus,
+                                    children: []
+                                };
+                                genusMap.set(genusKey, genusNode);
+                                orderNode.children.push(genusNode);
+                            }
+                            
+                            // 添加种节点
+                            if (pathogen.species) {
+                                genusNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.species) {
+                            // 如果没有科和属，直接添加到目
+                            orderNode.children.push({
+                                name: pathogen.species,
+                                value: 1,
+                                itemStyle: getNoteStyle(pathogen.note),
+                                pathogendata: pathogen
+                            });
+                        }
+                    } else if (pathogen.family) {
+                        // 如果没有门、纲和目，但有科
+                        const familyKey = kingdomKey + '|' + pathogen.family;
+                        let familyNode = familyMap.get(familyKey);
+                        if (!familyNode) {
+                            familyNode = {
+                                name: pathogen.family,
+                                children: []
+                            };
+                            familyMap.set(familyKey, familyNode);
+                            kingdomNode.children.push(familyNode);
+                        }
+                        
+                        // 处理属节点
+                        if (pathogen.genus) {
+                            const genusKey = familyKey + '|' + pathogen.genus;
+                            let genusNode = genusMap.get(genusKey);
+                            if (!genusNode) {
+                                genusNode = {
+                                    name: pathogen.genus,
+                                    children: []
+                                };
+                                genusMap.set(genusKey, genusNode);
+                                familyNode.children.push(genusNode);
+                            }
+                            
+                            // 添加种节点
+                            if (pathogen.species) {
+                                genusNode.children.push({
+                                    name: pathogen.species,
+                                    value: 1,
+                                    itemStyle: getNoteStyle(pathogen.note),
+                                    pathogendata: pathogen
+                                });
+                            }
+                        } else if (pathogen.species) {
+                            // 如果没有属，直接添加到科
+                            familyNode.children.push({
+                                name: pathogen.species,
+                                value: 1,
+                                itemStyle: getNoteStyle(pathogen.note),
+                                pathogendata: pathogen
+                            });
+                        }
+                    } else if (pathogen.genus) {
+                        // 如果没有门、纲、目和科，但有属
+                        const genusKey = kingdomKey + '|' + pathogen.genus;
+                        let genusNode = genusMap.get(genusKey);
+                        if (!genusNode) {
+                            genusNode = {
+                                name: pathogen.genus,
+                                children: []
+                            };
+                            genusMap.set(genusKey, genusNode);
+                            kingdomNode.children.push(genusNode);
+                        }
+                        
+                        // 添加种节点
+                        if (pathogen.species) {
+                            genusNode.children.push({
+                                name: pathogen.species,
+                                value: 1,
+                                itemStyle: getNoteStyle(pathogen.note),
+                                pathogendata: pathogen
+                            });
+                        }
+                    } else if (pathogen.species) {
+                        // 如果没有门、纲、目、科和属，直接添加到界
+                        kingdomNode.children.push({
+                            name: pathogen.species,
+                            value: 1,
+                            itemStyle: getNoteStyle(pathogen.note),
+                            pathogendata: pathogen
+                        });
+                    }
+                } else if (pathogen.species) {
+                    // 如果没有界，直接添加到域
+                    domainNode.children.push({
+                        name: pathogen.species,
+                        value: 1,
+                        itemStyle: getNoteStyle(pathogen.note),
+                        pathogendata: pathogen
+                    });
+                }
+            });
+            return root;
+        }
+        
+        // 根据域获取样式
+        function getDomainStyle(domain) {
+            if (domain === "细菌域") return '#ffffbb';
+            else if (domain.includes("病毒")) return '#bfe4ff';
+            else if (domain === "真核域") return '#fbd3df';
+            else return '#f5f5f5';
+        }
+        
+        // 根据备注获取样式
+        function getNoteStyle(note) {
+            if (note === "虚构") return { color: '#e0e0e0' };
+            else if (note === "阳性") return { color: 'blueviolet' };
+            else if (note === "阴性") return { color: 'red' };
+            else return { color: '#f5f5f5' };
+        }
+
+        // 使用构建的树状图数据
+        const treeData = buildTreeData();
+        
+        // 配置选项
+        const option = {
+            tooltip: {
+                trigger: 'item',
+                triggerOn: 'mousemove',
+                formatter: function (params) {
+                    // 显示详细信息
+                    if (params.data.pathogendata) {
+                        const p = params.data.pathogendata;
+                        return `
+                            <div style="font-weight:bold;margin-bottom:5px;">${p.species}</div>
+                            <div>域: ${p.domain}</div>
+                            <div>界: ${p.kingdom || '无'}</div>
+                            <div>门: ${p.phylum || '无'}</div>
+                            <div>纲: ${p.class || '无'}</div>
+                            <div>目: ${p.order || '无'}</div>
+                            <div>科: ${p.family || '无'}</div>
+                            <div>属: ${p.genus || '无'}</div>
+                            <div>备注: ${p.note || '无'}</div>
+                        `;
+                    } else {
+                        return `${params.name}<br/>子分类数: ${params.value || params.children.length}`;
+                    }
+                }
+            },
+            series: [{
+                type: 'tree',
+                data: [treeData],
+                layout: 'orthogonal',
+                orient: 'LR',
+                label: {
+                    position: 'left',
+                    verticalAlign: 'middle',
+                    align: 'right',
+                    fontSize: 16,
+                    fontFamily: '"STKaiti", "华文楷体", serif',
+                    formatter: function(params) {
+                        // 限制显示长度，防止文本过长
+                        return params.name.length > 15 ? params.name.substring(0, 15) + '...' : params.name;
+                    }
+                },
+                leaves: {
+                    label: {
+                        position: 'right',
+                        verticalAlign: 'middle',
+                        align: 'left',
+                        fontSize: 12,
+                        fontFamily: '"STKaiti", "华文楷体", serif'
+                    }
+                },
+                expandAndCollapse: true,
+                initialTreeDepth: 2, // 初始展开到第3层
+                roam: true,
+                lineStyle: {
+                    color: '#ccc',
+                    width: 1.5
+                },
+                emphasis: {
+                    focus: 'descendant'
+                },
+                animationDuration: 750,
+                animationDurationUpdate: 1000
+            }]
+        };
+
+        // 使用配置项设置图表
+        option && myChart.setOption(option);
+
+        // 响应式布局：适应窗口大小变化
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+        
+        // 添加点击事件，点击节点时跳转到对应病原体
+        myChart.on('click', function(params) {
+            if (params.data.pathogendata) {
+                const id = params.data.pathogendata.id;
+                if (linkMap.hasOwnProperty(id)) {
+                    window.open(linkMap[id], '_blank');
+                }
+            }
+        });
+        
+        // 控制按钮功能
+         document.getElementById('expandAll').addEventListener('click', function() {
+            myChart.setOption({
+                series: [{
+                    initialTreeDepth: 114514 // 设置足够大的深度以展开所有节点
+                }]
+            });
+        });
+        
+        document.getElementById('collapseAll').addEventListener('click', function() {
+            myChart.setOption({
+                series: [{
+                    initialTreeDepth: 1 // 只显示根节点
+                }]
+            });
+        });
+        
+        document.getElementById('resetView').addEventListener('click', function() {
+            myChart.setOption({
+                series: [{
+                    initialTreeDepth: 2 // 重置到初始深度
+                }]
+            });
+        });
+    </script>
+</body>
+</html>
